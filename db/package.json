@@ -1,0 +1,13 @@
+{
+  "name": "sistem-nilai-db",
+  "version": "1.0.0",
+  "description": "Skema dan seed database bersama Sistem Nilai",
+  "main": "db.js",
+  "scripts": {
+    "seed": "node seed.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^13.0.3"
+  }
+}
