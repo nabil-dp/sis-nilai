@@ -7,7 +7,8 @@
   "start": "node server.js",
   "dev": "node --watch server.js",
   "test:auth": "node scripts/test-auth.js",
-  "test:policy": "node scripts/test-policy.js"
+  "test:policy": "node scripts/test-policy.js",
+  "test:pep": "node scripts/test-pep.js"
 },
   "keywords": [],
   "author": "",
