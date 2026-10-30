@@ -9,7 +9,10 @@
   "test:auth": "node scripts/test-auth.js",
   "test:policy": "node scripts/test-policy.js",
   "test:pep": "node scripts/test-pep.js",
-  "test:e2e": "node scripts/test-e2e.js"
+  "test:e2e": "node scripts/test-e2e.js",
+  "test:audit": "node scripts/test-audit.js",
+  "test:jam": "node scripts/test-jam.js", 
+  "test:all": "node scripts/run-all.js"
 },
   "keywords": [],
   "author": "",
