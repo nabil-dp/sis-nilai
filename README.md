@@ -10,6 +10,8 @@ Prinsip zero trust yang diterapkan:
 
 ## Arsitektur
 
+<img width="490" height="249" alt="arsitektursisnilai" src="https://github.com/user-attachments/assets/249c5fd7-7081-4b3a-a7e2-7ea583987a91" />
+
 | Komponen | Peran (NIST SP 800-207) | File utama |
 |---|---|---|
 | API Gateway (3000) | PEP | `gateway/pep.js`, `gateway/proxy.js`, `gateway/server.js` |
