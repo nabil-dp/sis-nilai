@@ -1,0 +1,1944 @@
+{
+  "info": {
+    "name": "Sistem Nilai - Zero Trust",
+    "description": "Skenario pengujian tugas praktikum Zero Trust Security.\n\nPrasyarat: database di-seed, gateway (3000), service-nilai (3001), service-transkrip (3002) berjalan, dan jam akses gateway terbuka (JAM_MULAI=0, JAM_SELESAI=24).\nIsi variabel gateway_secret dengan GATEWAY_SECRET dari gateway/.env (hanya untuk folder 7).\nJalankan lewat Collection Runner sesuai urutan folder. Folder 8 mengubah data: seed ulang sebelum mengulang.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3000"
+    },
+    {
+      "key": "nilai_url",
+      "value": "http://localhost:3001"
+    },
+    {
+      "key": "transkrip_url",
+      "value": "http://localhost:3002"
+    },
+    {
+      "key": "gateway_secret",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": "password123"
+    },
+    {
+      "key": "dev_admin",
+      "value": "DEV-ADMIN-01"
+    },
+    {
+      "key": "dev_dosen1",
+      "value": "DEV-DOSEN1-01"
+    },
+    {
+      "key": "dev_dosen2",
+      "value": "DEV-DOSEN2-01"
+    },
+    {
+      "key": "dev_mhs1",
+      "value": "DEV-MHS1-01"
+    },
+    {
+      "key": "nim_mhs1",
+      "value": "2210001"
+    },
+    {
+      "key": "nim_mhs2",
+      "value": "2210002"
+    },
+    {
+      "key": "kelas_dosen1",
+      "value": "1"
+    },
+    {
+      "key": "kelas_dosen2",
+      "value": "2"
+    },
+    {
+      "key": "nilai_mhs1_k1",
+      "value": "1"
+    },
+    {
+      "key": "nilai_mhs1_k2",
+      "value": "4"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Setup: login semua akun",
+      "item": [
+        {
+          "name": "Login mhs1 (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"token_mhs1\", j.access_token);",
+                  "pm.collectionVariables.set(\"refresh_mhs1\", j.refresh_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"mhs1\",\"password\":\"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login dosen1 (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"token_dosen1\", j.access_token);",
+                  "pm.collectionVariables.set(\"refresh_dosen1\", j.refresh_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"dosen1\",\"password\":\"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login dosen2 (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"token_dosen2\", j.access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen2}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"dosen2\",\"password\":\"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login admin (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"token_admin\", j.access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_admin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"admin\",\"password\":\"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Token service (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.collectionVariables.set(\"token_service\", j.access_token);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/service",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"client_id\":\"service-nilai\",\"client_secret\":\"rahasia-service-nilai\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Autentikasi dan token (4.1)",
+      "item": [
+        {
+          "name": "Login password salah (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"mhs1\",\"password\":\"salah\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login device tidak terdaftar (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Device-ID",
+                "value": "DEV-ASING-99"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"mhs1\",\"password\":\"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login device milik user lain (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"mhs1\",\"password\":\"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Login tanpa X-Device-ID (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"username\":\"mhs1\",\"password\":\"{{password}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Token service: secret salah (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/service",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"client_id\":\"service-nilai\",\"client_secret\":\"salah\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Refresh token valid (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/refresh",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"refresh_token\":\"{{refresh_mhs1}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Logout: cabut refresh token (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/logout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"refresh_token\":\"{{refresh_mhs1}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Refresh setelah logout (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/refresh",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"refresh_token\":\"{{refresh_mhs1}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Logout dua kali (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/auth/logout",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"refresh_token\":\"{{refresh_mhs1}}\"}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Pemeriksaan di PEP (4.1, 4.3)",
+      "item": [
+        {
+          "name": "Tanpa token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        },
+        {
+          "name": "Skema bukan Bearer (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic abc123"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        },
+        {
+          "name": "Token ngawur (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer bukan.jwt.valid"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        },
+        {
+          "name": "Refresh token dipakai sebagai access token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{refresh_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        },
+        {
+          "name": "Device tidak terdaftar (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "DEV-ASING-99"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        },
+        {
+          "name": "Device milik user lain (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        },
+        {
+          "name": "Tanpa X-Device-ID (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        },
+        {
+          "name": "Endpoint tidak dikenal: default deny (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_admin}}"
+              }
+            ],
+            "url": "{{base_url}}/admin"
+          }
+        },
+        {
+          "name": "Path huruf besar /NILAI (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/NILAI"
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Mahasiswa (4.2)",
+      "item": [
+        {
+          "name": "Lihat nilai sendiri (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Hanya nilai milik sendiri\", function () { pm.expect(j.data.every(x => x.nim === pm.collectionVariables.get(\"nim_mhs1\"))).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        },
+        {
+          "name": "Lihat nilai NIM lain (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai?nim={{nim_mhs2}}"
+          }
+        },
+        {
+          "name": "Lihat transkrip sendiri (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/transkrip/{{nim_mhs1}}"
+          }
+        },
+        {
+          "name": "Lihat transkrip NIM lain (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/transkrip/{{nim_mhs2}}"
+          }
+        },
+        {
+          "name": "Ubah nilai (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/nilai/{{nilai_mhs1_k1}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nilai\":100}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Finalisasi kelas (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/kelas/{{kelas_dosen1}}/finalisasi"
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Dosen (4.2, 4.3) - ubah nilai butuh jam akses terbuka",
+      "item": [
+        {
+          "name": "Dosen1 lihat nilai: hanya kelasnya (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Hanya kelas yang diampu\", function () { pm.expect(j.data.every(x => x.kelas_id === Number(pm.collectionVariables.get(\"kelas_dosen1\")))).to.be.true; });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        },
+        {
+          "name": "Dosen1 minta kelas dosen2 (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai?kelas_id={{kelas_dosen2}}"
+          }
+        },
+        {
+          "name": "Dosen1 ubah nilai kelasnya (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/nilai/{{nilai_mhs1_k1}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nilai\":95}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Nilai 150: di luar rentang (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/nilai/{{nilai_mhs1_k1}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nilai\":150}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Dosen2 ubah nilai kelas dosen1 (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen2}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen2}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/nilai/{{nilai_mhs1_k1}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nilai\":10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Dosen1 ubah nilai kelas dosen2 (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/nilai/{{nilai_mhs1_k2}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nilai\":10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Dosen tidak boleh lihat transkrip (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              }
+            ],
+            "url": "{{base_url}}/transkrip/{{nim_mhs1}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "5. Admin (4.2)",
+      "item": [
+        {
+          "name": "Admin lihat transkrip mhs1 (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_admin}}"
+              }
+            ],
+            "url": "{{base_url}}/transkrip/{{nim_mhs1}}"
+          }
+        },
+        {
+          "name": "Admin lihat transkrip mhs2 (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_admin}}"
+              }
+            ],
+            "url": "{{base_url}}/transkrip/{{nim_mhs2}}"
+          }
+        },
+        {
+          "name": "Admin tidak boleh lihat nilai (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_admin}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        }
+      ]
+    },
+    {
+      "name": "6. /transkrip/sinkron hanya token service (4.2)",
+      "item": [
+        {
+          "name": "Token dosen (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/transkrip/sinkron",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Token admin (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_admin}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_admin}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/transkrip/sinkron",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Token mahasiswa (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/transkrip/sinkron",
+            "body": {
+              "mode": "raw",
+              "raw": "{}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Token service lolos PEP; body kosong ditolak service (400)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 400\", function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_service}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/transkrip/sinkron",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"kelas_id\":1,\"nilai\":[]}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Token service tidak boleh GET /nilai (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_service}}"
+              }
+            ],
+            "url": "{{base_url}}/nilai"
+          }
+        }
+      ]
+    },
+    {
+      "name": "7. Akses langsung ke service (4.1) - isi variabel gateway_secret",
+      "item": [
+        {
+          "name": "Service Nilai tanpa secret dan token (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{nilai_url}}/nilai"
+          }
+        },
+        {
+          "name": "Service Transkrip tanpa secret dan token (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{transkrip_url}}/transkrip/{{nim_mhs1}}"
+          }
+        },
+        {
+          "name": "Token valid tanpa gateway secret (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              }
+            ],
+            "url": "{{nilai_url}}/nilai"
+          }
+        },
+        {
+          "name": "Gateway secret salah (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Gateway-Secret",
+                "value": "secret-salah"
+              }
+            ],
+            "url": "{{nilai_url}}/nilai"
+          }
+        },
+        {
+          "name": "Gateway secret benar tanpa token (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "X-Gateway-Secret",
+                "value": "{{gateway_secret}}"
+              }
+            ],
+            "url": "{{nilai_url}}/nilai"
+          }
+        },
+        {
+          "name": "Gateway secret benar + token ngawur (401)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 401\", function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer bukan.jwt.valid"
+              },
+              {
+                "key": "X-Gateway-Secret",
+                "value": "{{gateway_secret}}"
+              }
+            ],
+            "url": "{{nilai_url}}/nilai"
+          }
+        },
+        {
+          "name": "Langsung: dosen2 ubah nilai kelas dosen1 (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen2}}"
+              },
+              {
+                "key": "X-Gateway-Secret",
+                "value": "{{gateway_secret}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{nilai_url}}/nilai/{{nilai_mhs1_k1}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nilai\":10}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Langsung: token dosen ke sinkron (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Gateway-Secret",
+                "value": "{{gateway_secret}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{transkrip_url}}/transkrip/sinkron",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"kelas_id\":1,\"nilai\":[{\"nim\":\"2210001\",\"nilai\":1}]}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "8. Finalisasi dan sinkron (MENGUBAH DATA, jalankan terakhir; seed ulang untuk mengulang)",
+      "item": [
+        {
+          "name": "Dosen2 finalisasi kelas dosen1 (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen2}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen2}}"
+              }
+            ],
+            "url": "{{base_url}}/kelas/{{kelas_dosen1}}/finalisasi"
+          }
+        },
+        {
+          "name": "Dosen1 finalisasi kelasnya (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Sinkron ke transkrip 3 data\", function () { pm.expect(j.sinkron.jumlah).to.eql(3); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              }
+            ],
+            "url": "{{base_url}}/kelas/{{kelas_dosen1}}/finalisasi"
+          }
+        },
+        {
+          "name": "Transkrip mhs1 terisi (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });",
+                  "const j = pm.response.json();",
+                  "pm.test(\"Transkrip berisi 1 mata kuliah\", function () { pm.expect(j.jumlah_mk).to.eql(1); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_mhs1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_mhs1}}"
+              }
+            ],
+            "url": "{{base_url}}/transkrip/{{nim_mhs1}}"
+          }
+        },
+        {
+          "name": "Ubah nilai yang sudah final (403)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 403\", function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{base_url}}/nilai/{{nilai_mhs1_k1}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"nilai\":50}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Finalisasi ulang: idempotent (200)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status 200\", function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token_dosen1}}"
+              },
+              {
+                "key": "X-Device-ID",
+                "value": "{{dev_dosen1}}"
+              }
+            ],
+            "url": "{{base_url}}/kelas/{{kelas_dosen1}}/finalisasi"
+          }
+        }
+      ]
+    }
+  ]
+}
